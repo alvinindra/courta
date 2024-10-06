@@ -7,14 +7,57 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Post {
-  id      String   @id @default(auto()) @map("_id") @db.ObjectId
-  title   String
-  date    DateTime @default(now())
-  content String
+model User {
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  email        String        @unique
+  password     String
+  avatar       String? // Optional avatar image URL
+  phoneNumber  String? // Optional phone number
+  role         String        @default("user") // For admin or user roles
+  reservations Reservation[]
+  reviews      Review[]
 }
 
-model User {
-  id   String @id @default(auto()) @map("_id") @db.ObjectId
-  name String
+model Field {
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  location     String
+  sportType    String
+  price        Float
+  reservations Reservation[]
+  Review       Review[]
+}
+
+model Reservation {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String   @db.ObjectId
+  user            User     @relation(fields: [userId], references: [id])
+  fieldId         String   @db.ObjectId
+  field           Field    @relation(fields: [fieldId], references: [id])
+  reservationDate DateTime
+  status          String   @default("pending") // pending, confirmed, canceled
+  payment         Payment?
+  createdAt       DateTime @default(now())
+}
+
+model Payment {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  reservationId String      @unique @db.ObjectId
+  reservation   Reservation @relation(fields: [reservationId], references: [id])
+  paymentMethod String // e.g., bank transfer
+  paymentProof  String // URL to the uploaded proof
+  paymentStatus String      @default("pending") // pending, completed, failed
+  createdAt     DateTime    @default(now())
+}
+
+model Review {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id])
+  fieldId   String   @db.ObjectId
+  field     Field    @relation(fields: [fieldId], references: [id])
+  rating    Int // Rating value, validate in the app (1 to 5)
+  comment   String
+  createdAt DateTime @default(now())
 }

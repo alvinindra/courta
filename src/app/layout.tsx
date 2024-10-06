@@ -2,7 +2,7 @@ import { GeistSans } from 'geist/font/sans'
 import type { Metadata } from 'next'
 import './globals.css'
 
-import { AuthProvider, Navbar, ThemeProvider } from '@/components/layout'
+import { Navbar, ThemeProvider } from '@/components/layout'
 
 import { AtomicState } from 'atomic-state'
 import { FetchConfig } from 'http-react'
@@ -26,16 +26,14 @@ export default function MainLayout({ children }) {
       <body className={GeistSans.className}>
         <ThemeProvider attribute='class' defaultTheme='system'>
           <main className='min-h-screen'>
-            <AuthProvider>
-              <AtomicState>
-                <FetchConfig baseUrl='/api'>
-                  <Navbar />
-                  <div className='container mx-auto py-8 px-6 md:px-8'>
-                    {children}
-                  </div>
-                </FetchConfig>
-              </AtomicState>
-            </AuthProvider>
+            <AtomicState>
+              <FetchConfig baseUrl='/api'>
+                <Navbar />
+                <div className='container mx-auto py-8 px-6 md:px-8'>
+                  {children}
+                </div>
+              </FetchConfig>
+            </AtomicState>
           </main>
         </ThemeProvider>
       </body>
