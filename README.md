@@ -1,5 +1,4 @@
-## Courta
----
+# Courta
 A 10-days challenge from my lecturer for Advanced Web subject, Courta is a web app for sports venue reservation using Next.js and MongoDB.
 
 ### Development
