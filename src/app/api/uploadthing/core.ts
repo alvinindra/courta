@@ -1,6 +1,5 @@
 import * as z from 'zod'
 import { createUploadthing, type FileRouter } from 'uploadthing/next'
-import { UploadThingError } from 'uploadthing/server'
 
 const f = createUploadthing({
   errorFormatter: err => {
@@ -17,8 +16,8 @@ export const ourFileRouter = {
   imageUploader: f({ image: { maxFileSize: '2MB' } }).onUploadComplete(
     async ({ metadata, file }) => {
       console.log('file url', file.url)
-      console.log('file metada', metadata)
-      // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
+      console.log('file metaData', metadata)
+      // !!! Whatever is returned here is sent to the clientSide `onClientUploadComplete` callback
       return { imageUrl: file.url }
     }
   )
