@@ -17,6 +17,9 @@ model User {
   role         String        @default("user") // For admin or user roles
   reservations Reservation[]
   reviews      Review[]
+  description  String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 }
 
 model Field {
@@ -27,6 +30,9 @@ model Field {
   price        Float
   reservations Reservation[]
   Review       Review[]
+  description  String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 }
 
 model Reservation {
@@ -39,6 +45,7 @@ model Reservation {
   status          String   @default("pending") // pending, confirmed, canceled
   payment         Payment?
   createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model Payment {
@@ -49,6 +56,7 @@ model Payment {
   paymentProof  String // URL to the uploaded proof
   paymentStatus String      @default("pending") // pending, completed, failed
   createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 }
 
 model Review {
@@ -60,4 +68,5 @@ model Review {
   rating    Int // Rating value, validate in the app (1 to 5)
   comment   String
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
