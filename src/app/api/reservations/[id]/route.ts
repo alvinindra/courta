@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
 import { ObjectId } from 'mongodb'
 import { verifyToken } from '@/lib/auth'
+import { sendEmail } from '@/lib/email'
 
 export async function GET(
   req: NextRequest,
@@ -13,6 +14,22 @@ export async function GET(
         { error: 'Invalid reservation ID' },
         { status: 404 }
       )
+    }
+
+    const authHeader = req.headers.get('authorization')
+
+    if (!authHeader) {
+      return NextResponse.json(
+        { error: 'Authorization header is missing' },
+        { status: 401 }
+      )
+    }
+
+    const token = authHeader.split(' ')[1]
+    const verifiedUser = verifyToken(token)
+
+    if (!verifiedUser) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const reservation = await prisma.reservation.findUnique({
@@ -82,8 +99,36 @@ export async function PUT(
       where: { id: params.id },
       data: {
         status: status || undefined
+      },
+      include: {
+        user: true,
+        field: true
       }
     })
+
+    const user = updatedReservation.user
+    if (status === 'confirmed' || status === 'cancelled') {
+      const subject = `Reservation ${
+        status.charAt(0).toUpperCase() + status.slice(1)
+      }`
+      const htmlContent = `
+        <p>Hello ${user.name},</p>
+        <p>Your reservation for the field <strong>${
+          updatedReservation.field.name
+        }</strong> 
+        on ${updatedReservation.date.toLocaleDateString()} at ${
+        updatedReservation.timeSlot
+      } 
+        has been <strong>${status}</strong>.</p>
+        <p>Thank you for using our service!</p>
+      `
+
+      await sendEmail({
+        to: user.email,
+        subject,
+        html: htmlContent
+      })
+    }
 
     return NextResponse.json({
       message: 'Reservation updated successfully',
