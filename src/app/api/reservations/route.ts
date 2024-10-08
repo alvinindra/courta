@@ -2,6 +2,9 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { verifyToken } from '@/lib/auth'
+import { sendEmail } from '@/lib/email'
+import { ObjectId } from 'mongodb'
+import { formatRupiah } from '@/lib/utils'
 
 export async function POST(req: Request) {
   const authHeader = req.headers.get('authorization')
@@ -22,19 +25,49 @@ export async function POST(req: Request) {
 
   try {
     // Parse JSON body
-    const { fieldId, date, timeSlot, totalPrice, paymentProofUrl } =
-      await req.json()
+    const { fieldId, date, timeSlot } = await req.json()
+    if (!ObjectId.isValid(fieldId)) {
+      return NextResponse.json(
+        { error: 'Invalid reservation ID format' },
+        { status: 400 } // Bad Request
+      )
+    }
 
     // Validation for required fields
-    if (!fieldId || !date || !timeSlot || !totalPrice || !paymentProofUrl) {
+    if (!fieldId || !date || !timeSlot) {
       return NextResponse.json(
         {
-          error:
-            'All fields are required (fieldId, date, timeSlot, totalPrice, paymentProofUrl)'
+          error: 'All fields are required (fieldId, date, timeSlot, totalPrice)'
         },
         { status: 400 }
       )
     }
+
+    const field = await prisma.field.findUnique({
+      where: { id: fieldId }
+    })
+
+    if (!field) {
+      return NextResponse.json({ error: 'Field not found' }, { status: 404 })
+    }
+
+    const [startTime, endTime] = timeSlot.split('-')
+
+    // Calculate the duration of the reservation in hours
+    const start = new Date(`1970-01-01T${startTime}:00Z`).getTime()
+    const end = new Date(`1970-01-01T${endTime}:00Z`).getTime()
+
+    const durationInHours = (end - start) / (1000 * 60 * 60) // Convert milliseconds to hours
+
+    if (durationInHours <= 0) {
+      return NextResponse.json(
+        { error: 'Invalid time slot duration' },
+        { status: 400 }
+      )
+    }
+
+    // Calculate the total price
+    const totalPrice = durationInHours * field.price
 
     const reservation = await prisma.reservation.create({
       data: {
@@ -42,10 +75,39 @@ export async function POST(req: Request) {
         fieldId,
         date: new Date(date),
         timeSlot,
-        totalPrice: parseFloat(totalPrice),
-        paymentProofUrl
+        totalPrice: totalPrice,
+        status: 'pending',
+        paymentProofUrl: null
       }
     })
+
+    const user = await prisma.user.findUnique({
+      where: { id: verifiedUser.userId }
+    })
+    if (user) {
+      await sendEmail({
+        to: user.email,
+        subject: 'Reservation Confirmation - Payment Required',
+        html: `<p>Hello ${user.name},</p>
+         <p>Thank you for your reservation. Please complete your payment for the reservation.</p>
+         <p><strong>Reservation Details:</strong></p>
+         <ul>
+           <li>Field: ${field.name}</li>
+           <li>Location: ${field.location}</li>
+           <li>Date: ${date}</li>
+           <li>Price: ${formatRupiah(field.price)}</li>
+           <li>Time Slot: ${timeSlot}</li>
+           <li>Total Price: Rp${formatRupiah(totalPrice)}</li>
+         </ul>
+         <p>Please upload your payment proof to confirm the reservation.</p>
+         <div>Go to your confirmation page: <a href="${
+           process.env.SITE_URL
+         }/confirmation/${
+          field.id
+        }" target="_blank">Confirm Your Payment</a></div>
+         <p>Thank you!</p>`
+      })
+    }
 
     return NextResponse.json({
       message: 'Reservation created successfully',
@@ -62,6 +124,22 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
   try {
+    const authHeader = req.headers.get('authorization')
+
+    if (!authHeader) {
+      return NextResponse.json(
+        { error: 'Authorization header is missing' },
+        { status: 401 }
+      )
+    }
+
+    const token = authHeader.split(' ')[1]
+    const verifiedUser = verifyToken(token)
+
+    if (!verifiedUser) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+    }
+
     const { searchParams } = new URL(req.url)
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
@@ -69,7 +147,7 @@ export async function GET(req: Request) {
 
     const skip = (page - 1) * limit
 
-    const whereClause: any = {}
+    const whereClause: any = { userId: verifiedUser.userId }
     if (status) whereClause.status = status
 
     const reservations = await prisma.reservation.findMany({
