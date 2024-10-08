@@ -7,14 +7,15 @@ A 10-days challenge from my lecturer for Advanced Web subject, Courta is a web a
 npm run dev
 ```
 
-You need to pass an env. variable with the MongoDB connection string, as well as any variables required by `next-auth`:
+You need to pass an env. variable with the MongoDB connection string, as well as any variables required:
 
 ```
+SITE_URL=
 MONGO_URI=
-NEXTAUTH_SECRET=
-GOOGLE_APP_CLIENT_ID=
-GOOGLE_APP_CLIENT_SECRET=
-NEXTAUTH_URL=
+JWT_SECRET=
+EMAIL_USER=
+EMAIL_PASS=
+UPLOADTHING_TOKEN=
 ```
 
 
@@ -39,10 +40,6 @@ Click the Copy button next to the connection string:
 ![alt text](docs/connection-string.png)
 
 Replace `<password>` with the password for your user. Ensure any option params are [URL encoded](https://dochub.mongodb.org/core/atlas-url-encoding).
-
----
-
-- [`GOOGLE_APP_CLIENT_ID` and `GOOGLE_APP_CLIENT_SECRET`](https://developers.google.com/identity/oauth2/web/guides/get-google-api-clientid)
 
 ---
 
@@ -88,7 +85,5 @@ You can add those variables to a `.ENV` file (don't forget to add it to your `.g
 Related documentation:
 
 - [`nextjs`](https://nextjs.org/docs)
-
-- [`next-auth`](https://next-auth.js.org/getting-started/introduction)
 
 - [`http-react`](https://httpr.vercel.app/docs)
