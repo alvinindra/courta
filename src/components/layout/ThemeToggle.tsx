@@ -11,8 +11,7 @@ export function ThemeToggle() {
 
   const nextTheme: any = {
     light: 'dark',
-    dark: 'system',
-    system: 'light'
+    dark: 'light'
   }
 
   const ThemeIcon = {

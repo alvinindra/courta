@@ -6,10 +6,11 @@ import { Navbar, ThemeProvider } from '@/components/layout'
 
 import { AtomicState } from 'atomic-state'
 import { FetchConfig } from 'http-react'
+import Footer from '@/components/layout/Footer'
 
 export const metadata: Metadata = {
-  title: 'Home',
-  description: 'Home page '
+  title: 'Home | Courta',
+  description: 'Home page'
 }
 
 export default function MainLayout({ children }) {
@@ -29,9 +30,8 @@ export default function MainLayout({ children }) {
             <AtomicState>
               <FetchConfig baseUrl='/api'>
                 <Navbar />
-                <div className='container mx-auto py-8 px-6 md:px-8'>
-                  {children}
-                </div>
+                {children}
+                <Footer />
               </FetchConfig>
             </AtomicState>
           </main>

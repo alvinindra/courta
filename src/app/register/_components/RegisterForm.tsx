@@ -25,14 +25,10 @@ export function SignUpForm() {
       </CardHeader>
       <CardContent>
         <div className='grid gap-4'>
-          <div className='grid grid-cols-2 gap-4'>
+          <div className='grid grid-cols-1 gap-4'>
             <div className='grid gap-2'>
-              <Label htmlFor='first-name'>First name</Label>
-              <Input id='first-name' placeholder='Max' required />
-            </div>
-            <div className='grid gap-2'>
-              <Label htmlFor='last-name'>Last name</Label>
-              <Input id='last-name' placeholder='Robinson' required />
+              <Label htmlFor='first-name'>Full Name</Label>
+              <Input id='full-name' placeholder='John Doe' required />
             </div>
           </div>
           <div className='grid gap-2'>
@@ -50,9 +46,6 @@ export function SignUpForm() {
           </div>
           <Button type='submit' className='w-full'>
             Create an account
-          </Button>
-          <Button variant='outline' className='w-full'>
-            Sign up with GitHub
           </Button>
         </div>
         <div className='mt-4 text-center text-sm'>
