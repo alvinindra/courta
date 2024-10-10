@@ -25,7 +25,7 @@ export default function MainLayout({ children }) {
       </head>
 
       <body className={GeistSans.className}>
-        <ThemeProvider attribute='class' defaultTheme='system'>
+        <ThemeProvider attribute='class' defaultTheme='light'>
           <main className='min-h-screen'>
             <AtomicState>
               <FetchConfig baseUrl='/api'>

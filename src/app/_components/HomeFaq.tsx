@@ -1,3 +1,4 @@
+import Anim from '@/components/global/Anim'
 import {
   Accordion,
   AccordionContent,
@@ -32,19 +33,21 @@ const HomeFaq = () => {
   return (
     <section className='py-8 pb-32'>
       <div className='container'>
-        <h1 className='mb-4 text-3xl font-bold md:mb-11 text-center lg:text-5xl'>
-          Frequently asked questions
-        </h1>
-        {faqs.map((faq, index) => (
-          <Accordion key={index} type='single' collapsible>
-            <AccordionItem value={`item-${index}`}>
-              <AccordionTrigger className='hover:text-foreground/60	hover:no-underline'>
-                {faq.question}
-              </AccordionTrigger>
-              <AccordionContent>{faq.answer}</AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        ))}
+        <Anim>
+          <h1 className='mb-4 text-3xl font-bold md:mb-11 text-center lg:text-5xl'>
+            Frequently asked questions
+          </h1>
+          {faqs.map((faq, index) => (
+            <Accordion key={index} type='single' collapsible>
+              <AccordionItem value={`item-${index}`}>
+                <AccordionTrigger className='hover:text-foreground/60	hover:no-underline'>
+                  {faq.question}
+                </AccordionTrigger>
+                <AccordionContent>{faq.answer}</AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          ))}
+        </Anim>
       </div>
     </section>
   )

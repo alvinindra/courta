@@ -1,4 +1,5 @@
 import Anim from '@/components/global/Anim'
+import Link from 'next/link'
 
 export default function HomeHero() {
   return (
@@ -11,7 +12,7 @@ export default function HomeHero() {
                 Book Your Game, Anytime, Anywhere!
               </h1>
               <p className='mt-4 text-xl dark:text-white text-gray-500'>
-                Easily find and book fields for your next match or practice.
+                Easily find and book venue for your next match or practice.
               </p>
             </div>
           </Anim>
@@ -83,12 +84,12 @@ export default function HomeHero() {
               </div>
 
               <Anim className='container'>
-                <a
-                  href='/fields'
+                <Link
+                  href='/venue'
                   className='transition inline-block relative z-10 rounded-md border border-transparent bg-amber-500 px-4 lg:px-8 py-3 text-center font-medium text-white hover:bg-amber-600'
                 >
                   Reserve Now
-                </a>
+                </Link>
               </Anim>
             </div>
           </div>

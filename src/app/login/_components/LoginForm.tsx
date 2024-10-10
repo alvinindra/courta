@@ -16,7 +16,7 @@ export const description =
 
 export function LoginForm() {
   return (
-    <Card className='mx-auto max-w-sm'>
+    <Card className='mx-auto max-w-sm lg:mt-12'>
       <CardHeader>
         <CardTitle className='text-2xl'>Login</CardTitle>
         <CardDescription>
@@ -45,9 +45,6 @@ export function LoginForm() {
           </div>
           <Button type='submit' className='w-full'>
             Login
-          </Button>
-          <Button variant='outline' className='w-full'>
-            Login with Google
           </Button>
         </div>
         <div className='mt-4 text-center text-sm'>
