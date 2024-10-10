@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
-import { ChevronDown, Filter, Grid2X2, X } from 'lucide-react'
+import { ChevronDown, Filter, Grid2X2, Search, X } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,14 +23,8 @@ import {
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { Input } from '@/components/ui/input'
 
-const sortOptions = [
-  { name: 'Most Popular', href: '#', current: true },
-  { name: 'Best Rating', href: '#', current: false },
-  { name: 'Newest', href: '#', current: false },
-  { name: 'Price: Low to High', href: '#', current: false },
-  { name: 'Price: High to Low', href: '#', current: false }
-]
 const subCategories = [
   { name: 'Totes', href: '#' },
   { name: 'Backpacks', href: '#' },
@@ -125,7 +119,7 @@ export default function VenueList() {
                       <ChevronDown />
                     </div>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align='start'>
+                  <DropdownMenuContent align='end'>
                     <DropdownMenuItem>Ascending</DropdownMenuItem>
                     <DropdownMenuItem>Descanding</DropdownMenuItem>
                     <DropdownMenuItem>Price: Low to High</DropdownMenuItem>
@@ -160,6 +154,14 @@ export default function VenueList() {
               {/* Filters */}
               <Form {...form}>
                 <form className='hidden lg:block'>
+                  <div className='relative ml-auto w-full mb-4 flex-1 flex md:grow-0'>
+                    <Search className='absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground' />
+                    <Input
+                      type='search'
+                      placeholder='Search...'
+                      className='w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]'
+                    />
+                  </div>
                   <FormField
                     control={form.control}
                     name='items'
