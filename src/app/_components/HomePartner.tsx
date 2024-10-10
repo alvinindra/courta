@@ -15,7 +15,7 @@ export default function HomePartner() {
     <>
       <Anim className='overflow-hidden'>
         <div className='container pt-20 pb-8'>
-          <h2 className='text-center text-4xl font-bold tracking-tight'>
+          <h2 className='text-center text-3xl lg:text-5xl font-bold tracking-tight'>
             Our Partners
           </h2>
         </div>

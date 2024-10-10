@@ -11,7 +11,7 @@ export default function Navbar() {
   const pathname = usePathname()
 
   return (
-    <header className='border-b border-opacity-10 bg-white sticky top-0 z-50'>
+    <header className='border-b border-opacity-10 bg-white dark:bg-black sticky top-0 z-50'>
       <div className='container mx-auto flex items-center justify-between py-2'>
         <div className='space-x-3'>
           <Link className='font-bold text-lg w-16 h-auto' href={'/'}>
@@ -26,7 +26,7 @@ export default function Navbar() {
                 <CircleUser className='h-5 w-5' />
                 <span className='sr-only'>Login Menu</span>
               </Button>
-              <div className='font-medium'>Login</div>
+              <div className='font-medium dark:text-white'>Login</div>
             </Link>
           )}
           <BrowserOnly>

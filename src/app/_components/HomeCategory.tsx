@@ -3,11 +3,11 @@ export default function HomeCategory() {
     <section>
       <div className='mx-auto container py-8 sm:py-12'>
         <header className='text-center'>
-          <h2 className='text-3xl font-bold text-gray-900 sm:text-4xl'>
+          <h2 className='text-3xl font-bold text-gray-900 dark:text-white lg:text-5xl'>
             Explore Fields
           </h2>
 
-          <p className='mx-auto mt-4 max-w-md text-gray-500'>
+          <p className='mx-auto mt-4 max-w-md dark:text-white text-gray-500'>
             Explore our fields type and book now!
           </p>
         </header>

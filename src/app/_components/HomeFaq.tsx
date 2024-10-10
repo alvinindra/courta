@@ -32,7 +32,7 @@ const HomeFaq = () => {
   return (
     <section className='py-8 pb-32'>
       <div className='container'>
-        <h1 className='mb-4 text-3xl font-bold md:mb-11 md:text-4xl'>
+        <h1 className='mb-4 text-3xl font-bold md:mb-11 text-center lg:text-5xl'>
           Frequently asked questions
         </h1>
         {faqs.map((faq, index) => (
