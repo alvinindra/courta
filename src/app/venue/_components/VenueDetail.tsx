@@ -9,7 +9,7 @@ const product = {
   href: '#',
   breadcrumbs: [
     { id: 1, name: 'Home', href: '/' },
-    { id: 2, name: 'Venue', href: '#' }
+    { id: 2, name: 'Venue', href: '/venue' }
   ],
   images: [
     {
@@ -177,7 +177,7 @@ export default function VenueDetail() {
                 <p className='sr-only'>{reviews.average} out of 5 stars</p>
                 <a
                   href={reviews.href}
-                  className='ml-3 text-sm font-medium text-indigo-600 hover:text-indigo-500'
+                  className='ml-3 text-sm font-medium text-amber-500 hover:text-amber-600'
                 >
                   {reviews.totalCount} reviews
                 </a>
@@ -220,7 +220,7 @@ export default function VenueDetail() {
                   <h3 className='text-sm font-medium text-gray-900'>Size</h3>
                   <a
                     href='#'
-                    className='text-sm font-medium text-indigo-600 hover:text-indigo-500'
+                    className='text-sm font-medium text-amber-500 hover:text-amber-600'
                   >
                     Size guide
                   </a>
@@ -273,9 +273,9 @@ export default function VenueDetail() {
 
               <button
                 type='submit'
-                className='mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
+                className='mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-amber-500 px-8 py-3 text-base font-medium text-white hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2'
               >
-                Add to bag
+                Reserve
               </button>
             </form>
           </div>

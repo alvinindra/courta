@@ -79,3 +79,7 @@ body::-webkit-scrollbar-thumb {
   background: var(--sb-thumb-color);
   border-radius: 2px;
 }
+
+.react-datepicker-wrapper {
+  width: 100%;
+}
