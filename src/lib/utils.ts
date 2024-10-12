@@ -20,5 +20,5 @@ export const UploadDropzone = generateUploadDropzone<OurFileRouter>()
 
 export function formatRupiah(amount: number) {
   const formatter = new Intl.NumberFormat('id-ID')
-  return `Rp. ${formatter.format(amount)}`
+  return `Rp${formatter.format(amount)}`
 }

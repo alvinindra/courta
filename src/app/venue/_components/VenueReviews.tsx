@@ -39,7 +39,7 @@ export default function VenueReviews() {
   const averageRating = 4
 
   return (
-    <div className='container mx-auto'>
+    <div id='reviews' className='container mx-auto'>
       <h2 className='text-2xl font-bold mb-4'>Customer Reviews</h2>
       <div className='flex flex-col md:flex-row gap-8'>
         <div className='w-full md:w-1/3'>

@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 export default function MainLayout({ children }) {
   return (
-    <html suppressHydrationWarning>
+    <html className='scroll-smooth' suppressHydrationWarning>
       <head>
         <title>Courta</title>
         <meta

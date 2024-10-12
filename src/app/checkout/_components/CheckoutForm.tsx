@@ -106,7 +106,7 @@ export default function CheckoutForm() {
           </div>
         </div>
 
-        <div className='shadow-md rounded-3xl h-fit p-6 border w-full md:w-1/3'>
+        <div className='shadow-sm rounded-3xl h-fit p-6 border w-full md:w-1/3'>
           <h2 className='text-3xl font-bold mb-4'>Order Summary</h2>
           <div className='mt-4 space-y-2'>
             <div className='flex justify-between'>

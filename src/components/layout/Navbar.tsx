@@ -58,9 +58,9 @@ export default function Navbar() {
               <div className='font-medium dark:text-white'>Login</div>
             </Link>
           )}
-          <BrowserOnly>
+          {/* <BrowserOnly>
             <ThemeToggle />
-          </BrowserOnly>
+          </BrowserOnly> */}
         </div>
       </div>
     </header>
