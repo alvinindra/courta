@@ -23,7 +23,7 @@ export default function Navbar() {
     <header className='border-b border-opacity-10 bg-white dark:bg-black sticky top-0 z-50'>
       <div className='container mx-auto flex items-center justify-between py-2'>
         <div className='space-x-3'>
-          <Link className='font-bold text-lg w-16 h-auto' href={'/'}>
+          <Link className='font-extrabold text-2xl w-16 h-auto' href={'/'}>
             COURTA
           </Link>
         </div>
