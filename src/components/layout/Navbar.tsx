@@ -15,9 +15,20 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useGeneralStore } from '@/store'
+import { useRouter } from 'next/navigation'
+import Cookies from 'js-cookie'
 
 export default function Navbar() {
+  const router = useRouter()
+  const { profile, setProfile } = useGeneralStore()
   const pathname = usePathname()
+
+  const handleLogout = () => {
+    Cookies.remove('token')
+    setProfile(null)
+    router.push('/')
+  }
 
   return (
     <header className='border-b border-opacity-10 bg-white dark:bg-black sticky top-0 z-50'>
@@ -29,34 +40,50 @@ export default function Navbar() {
         </div>
 
         <div className='flex items-center gap-x-8'>
-          {/* <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant='secondary' size='icon' className='rounded-full'>
-                <Avatar>
-                  <AvatarImage
-                    src='https://github.com/shadcn.png'
-                    alt='@shadcn'
-                  />
-                  <AvatarFallback>AI</AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align='end'>
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Logout</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu> */}
-          {!['/login', '/register'].includes(pathname) && (
-            <Link className='flex flex-row gap-3 items-center' href={`/login`}>
-              <Button variant='secondary' size='icon' className='rounded-full'>
-                <CircleUser className='h-5 w-5' />
-                <span className='sr-only'>Login Menu</span>
-              </Button>
-              <div className='font-medium dark:text-white'>Login</div>
-            </Link>
+          {profile ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant='secondary'
+                  size='icon'
+                  className='rounded-full'
+                >
+                  <Avatar>
+                    <AvatarImage src={profile?.avatar} alt={profile.name} />
+                    <AvatarFallback>{profile?.name?.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align='end'>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => router.push('/profile')}>
+                  Profile
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <>
+              {!['/login', '/register'].includes(pathname) && (
+                <Link
+                  className='flex flex-row gap-3 items-center'
+                  href={`/login`}
+                >
+                  <Button
+                    variant='secondary'
+                    size='icon'
+                    className='rounded-full'
+                  >
+                    <CircleUser className='h-5 w-5' />
+                    <span className='sr-only'>Login Menu</span>
+                  </Button>
+                  <div className='font-medium dark:text-white'>Login</div>
+                </Link>
+              )}
+            </>
           )}
           {/* <BrowserOnly>
             <ThemeToggle />
