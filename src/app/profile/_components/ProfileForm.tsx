@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -16,22 +16,12 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from '@/hooks/use-toast'
+import { apiClient } from '@/lib/api'
+import { useGeneralStore } from '@/store'
+import { UploadButton } from '@/lib/utils'
 
 const profileSchema = z.object({
-  avatar: z
-    .custom<File | undefined>()
-    .optional()
-    .refine(
-      file => {
-        if (file) {
-          return file.size <= 500000 // 500kb
-        }
-        return true
-      },
-      {
-        message: 'Avatar file must be 5MB or less.'
-      }
-    ),
+  avatar: z.custom<File | string | undefined>().optional(),
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
   email: z.string().email({ message: 'Invalid email address.' }),
   phoneNumber: z
@@ -44,22 +34,34 @@ type ProfileFormValues = z.infer<typeof profileSchema>
 
 export default function ProfileForm() {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
-
+  const { profile } = useGeneralStore()
+  const [isLoading, setIsLoading] = useState(false)
   const {
     register,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
+    getValues,
+    setValue
   } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema)
   })
 
-  const onSubmit = (data: ProfileFormValues) => {
-    // Here you would typically send the data to your backend
-    console.log(data)
-    toast({
-      title: 'Profile updated',
-      description: 'Your profile has been successfully updated.'
-    })
+  const onSubmit = async () => {
+    try {
+      setIsLoading(true)
+      const res = await apiClient.put(
+        'api/profile/update',
+        JSON.stringify(getValues())
+      )
+      toast({
+        title: 'Profile updated',
+        description: 'Your profile has been successfully updated.'
+      })
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,6 +75,15 @@ export default function ProfileForm() {
     }
   }
 
+  useEffect(() => {
+    if (profile) {
+      setAvatarPreview(profile.avatar || '')
+      setValue('name', profile.name)
+      setValue('email', profile.email)
+      setValue('phoneNumber', profile.phoneNumber || '')
+    }
+  }, [profile, setValue])
+
   return (
     <Card className='w-fulld'>
       <CardHeader>
@@ -83,19 +94,21 @@ export default function ProfileForm() {
         <CardContent className='space-y-4'>
           <div className='space-y-2'>
             <Label htmlFor='avatar'>Avatar</Label>
-            <Input
-              id='avatar'
-              type='file'
-              accept='image/*'
-              className='cursor-pointer'
-              {...register('avatar')}
-              onChange={e => {
-                register('avatar').onChange(e)
-                handleAvatarChange(e)
+            <UploadButton
+              endpoint='imageUploader'
+              onClientUploadComplete={res => {
+                // Do something with the response
+                console.log('Files: ', res)
+                setAvatarPreview(res[0].url)
+                setValue('avatar', res[0].url)
+              }}
+              onUploadError={(error: Error) => {
+                // Do something with the error.
+                console.error(`ERROR! ${error.message}`)
               }}
             />
             {avatarPreview && (
-              <div className='mt-2'>
+              <div className='flex justify-center mt-2'>
                 <img
                   src={avatarPreview}
                   alt='Avatar preview'
@@ -132,7 +145,7 @@ export default function ProfileForm() {
           </div>
         </CardContent>
         <CardFooter>
-          <Button type='submit' className='w-full'>
+          <Button loading={isLoading} type='submit' className='w-full'>
             Update Profile
           </Button>
         </CardFooter>

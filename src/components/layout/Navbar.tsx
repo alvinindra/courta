@@ -18,6 +18,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useGeneralStore } from '@/store'
 import { useRouter } from 'next/navigation'
 import Cookies from 'js-cookie'
+import { useEffect } from 'react'
+import { apiClient } from '@/lib/api'
 
 export default function Navbar() {
   const router = useRouter()
@@ -29,6 +31,21 @@ export default function Navbar() {
     setProfile(null)
     router.push('/')
   }
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await apiClient.get('api/profile')
+        if (response.data.data) {
+          setProfile(response.data.data)
+        }
+      } catch (error) {
+        console.error('Failed to fetch profile:', error)
+      }
+    }
+
+    fetchProfile()
+  }, [setProfile])
 
   return (
     <header className='border-b border-opacity-10 bg-white dark:bg-black sticky top-0 z-50'>

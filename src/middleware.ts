@@ -15,6 +15,10 @@ export function middleware(request: NextRequest) {
     if (role?.value === 'admin') {
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
+
+    if (pathname === '/login') {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
   }
 
   // Redirect to login if not authenticated and trying to access protected routes

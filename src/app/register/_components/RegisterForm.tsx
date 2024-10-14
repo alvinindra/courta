@@ -19,9 +19,6 @@ import { toast } from '@/hooks/use-toast'
 import { apiClient } from '@/lib/api'
 import Cookies from 'js-cookie'
 
-export const description =
-  "A sign up form with first name, last name, email and password inside a card. There's an option to sign up with GitHub and a link to login if you already have an account"
-
 export function SignUpForm() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
@@ -44,7 +41,7 @@ export function SignUpForm() {
       Cookies.set('token', res.data.token)
       setProfile(res.data.user)
       toast({
-        title: 'Berhasil melakukan register'
+        title: 'Register is successfully'
       })
 
       if (res.data.user.role === 'admin') {
