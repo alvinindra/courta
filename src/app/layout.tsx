@@ -7,6 +7,7 @@ import { Navbar, ThemeProvider } from '@/components/layout'
 import { AtomicState } from 'atomic-state'
 import { FetchConfig } from 'http-react'
 import Footer from '@/components/layout/Footer'
+import { Toaster } from '@/components/ui/toaster'
 
 export const metadata: Metadata = {
   title: 'Home | Courta',
@@ -34,6 +35,7 @@ export default function MainLayout({ children }) {
                 <Footer />
               </FetchConfig>
             </AtomicState>
+            <Toaster />
           </main>
         </ThemeProvider>
       </body>
