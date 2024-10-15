@@ -158,16 +158,28 @@ export async function GET(req: Request) {
       where: whereClause,
       include: {
         user: true,
-        field: true
+        field: true,
+        reviews: {
+          select: {
+            rating: true
+          }
+        }
       }
     })
+
+    const reservationsWithReviewStatus = reservations.map(reservation => ({
+      ...reservation,
+      hasReview: reservation.reviews.length > 0, // Check if there is any review
+      rating:
+        reservation.reviews.length > 0 ? reservation.reviews[0].rating : null // Get the review rating if it exists
+    }))
 
     const totalReservations = await prisma.reservation.count({
       where: whereClause
     })
 
     return NextResponse.json({
-      data: reservations,
+      data: reservationsWithReviewStatus,
       meta: {
         page,
         limit,

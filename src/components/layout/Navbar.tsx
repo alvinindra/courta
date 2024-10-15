@@ -68,6 +68,17 @@ export default function Navbar() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align='end'>
+                {profile?.role === 'admin' ? (
+                  <DropdownMenuItem onClick={() => router.push('/dashboard')}>
+                    Dashboard
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem
+                    onClick={() => router.push('/reservations')}
+                  >
+                    My Reservations
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => router.push('/profile')}>
                   Profile

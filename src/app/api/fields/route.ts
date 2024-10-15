@@ -25,10 +25,20 @@ export async function GET(req: Request) {
     }
 
     if (searchQuery) {
-      whereClause.name = {
-        contains: searchQuery, // Searching fields that contain the searchQuery string
-        mode: 'insensitive' // Case-insensitive search
-      }
+      whereClause.OR = [
+        {
+          name: {
+            contains: searchQuery, // Searching fields that contain the searchQuery string
+            mode: 'insensitive' // Case-insensitive search
+          }
+        },
+        {
+          location: {
+            contains: searchQuery, // Searching location fields that contain the searchQuery string
+            mode: 'insensitive' // Case-insensitive search
+          }
+        }
+      ]
     }
 
     // Fetch the paginated, filtered, and sorted fields from the database

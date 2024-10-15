@@ -33,7 +33,8 @@ export async function GET(req: Request) {
         phoneNumber: true,
         avatar: true, // Assuming avatarUrl is part of the user's profile
         createdAt: true,
-        updatedAt: true
+        updatedAt: true,
+        role: true
       }
     })
 

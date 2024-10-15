@@ -59,6 +59,9 @@ export interface MetaReservation {
     createdAt: string
     updatedAt: string
   }
+  reviews: { rating: number }[]
+  hasReview: boolean | null
+  rating: number
 }
 
 export interface MetaUser {
