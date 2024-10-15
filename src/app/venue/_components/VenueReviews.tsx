@@ -39,7 +39,7 @@ export default function VenueReviews() {
   const averageRating = 4
 
   return (
-    <div id='reviews' className='container mx-auto'>
+    <div id='reviews' className='mt-8 container mx-auto'>
       <h2 className='text-2xl font-bold mb-4'>Customer Reviews</h2>
       <div className='flex flex-col md:flex-row gap-8'>
         <div className='w-full md:w-1/3'>
@@ -68,7 +68,7 @@ export default function VenueReviews() {
               <span className='ml-2 text-sm text-gray-600'>{count}%</span>
             </div>
           ))}
-          <div className='mt-6'>
+          {/* <div className='mt-6'>
             <h3 className='font-semibold mb-2'>Share your thoughts</h3>
             <p className='text-sm text-gray-600 mb-4'>
               If you've used this product, share your thoughts with other
@@ -77,7 +77,7 @@ export default function VenueReviews() {
             <Button variant='outline' className='w-full'>
               Write a review
             </Button>
-          </div>
+          </div> */}
         </div>
         <div className='w-full md:w-2/3'>
           {reviews.map((review, index) => (

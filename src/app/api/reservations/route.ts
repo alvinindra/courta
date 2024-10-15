@@ -25,7 +25,7 @@ export async function POST(req: Request) {
 
   try {
     // Parse JSON body
-    const { fieldId, date, timeSlot } = await req.json()
+    const { fieldId, date, startTime, endTime, timeSlot } = await req.json()
     if (!ObjectId.isValid(fieldId)) {
       return NextResponse.json(
         { error: 'Invalid reservation ID format' },
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
     }
 
     // Validation for required fields
-    if (!fieldId || !date || !timeSlot) {
+    if (!fieldId || !date || !startTime || !endTime || !timeSlot) {
       return NextResponse.json(
         {
           error: 'All fields are required (fieldId, date, timeSlot, totalPrice)'
@@ -51,13 +51,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Field not found' }, { status: 404 })
     }
 
-    const [startTime, endTime] = timeSlot.split('-')
-
     // Calculate the duration of the reservation in hours
-    const start = new Date(`1970-01-01T${startTime}:00Z`).getTime()
-    const end = new Date(`1970-01-01T${endTime}:00Z`).getTime()
-
-    const durationInHours = (end - start) / (1000 * 60 * 60) // Convert milliseconds to hours
+    const durationInHours = Math.ceil(
+      (new Date(endTime).getTime() - new Date(startTime).getTime()) /
+        (1000 * 60 * 60)
+    ) // Convert milliseconds to hours
 
     if (durationInHours <= 0) {
       return NextResponse.json(
@@ -71,11 +69,15 @@ export async function POST(req: Request) {
 
     const reservation = await prisma.reservation.create({
       data: {
-        userId: verifiedUser.userId,
-        fieldId,
+        user: {
+          connect: { id: verifiedUser.userId }
+        },
+        field: {
+          connect: { id: fieldId }
+        },
         date: new Date(date),
         timeSlot,
-        totalPrice: totalPrice,
+        totalPrice,
         status: 'pending',
         paymentProofUrl: null
       }

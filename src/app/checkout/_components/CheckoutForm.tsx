@@ -1,61 +1,102 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ChevronDown, Star, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
-
-const products = [
-  {
-    id: 1,
-    name: 'Basic Tee',
-    color: 'Black',
-    size: 'Large',
-    price: 32.0,
-    image: '/placeholder.svg?height=64&width=64'
-  },
-  {
-    id: 2,
-    name: 'Basic Tee',
-    color: 'Sienna',
-    size: 'Large',
-    price: 32.0,
-    image: '/placeholder.svg?height=64&width=64'
-  }
-]
+import { useGeneralStore } from '@/store'
+import { formatRupiah } from '@/lib/utils'
+import { apiClient } from '@/lib/api'
+import { toast } from '@/hooks/use-toast'
+import { useForm } from 'react-hook-form'
+import { useRouter } from 'next/navigation'
 
 export default function CheckoutForm() {
-  const [startDate, setStartDate] = useState(new Date())
-  const [quantities, setQuantities] = useState({ 1: 1, 2: 1 })
-
-  const subtotal = products.reduce(
-    (sum, product) => sum + product.price * quantities[product.id],
-    0
+  const router = useRouter()
+  const { profile, checkout } = useGeneralStore()
+  const [date, setDate] = useState(new Date())
+  const [startDate, setStartDate] = useState<any>(new Date())
+  const [endDate, setEndDate] = useState<any>(
+    new Date(new Date().getTime() + 60 * 60 * 1000)
   )
+  const [isLoading, setIsLoading] = useState(false)
+  const [totalPrice, setTotalPrice] = useState(0)
+  const [duration, setDuration] = useState(1)
+  const { handleSubmit } = useForm({
+    defaultValues: {
+      email: '',
+      name: '',
+      startDate: new Date(),
+      endDate: new Date(new Date().getTime() + 60 * 60 * 1000)
+    }
+  })
+
+  const handleReserve = async () => {
+    const reservationData = {
+      fieldId: checkout?.venue?.id,
+      date: startDate.toISOString(),
+      timeSlot: `${startDate.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit'
+      })}-${endDate.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit'
+      })}`,
+      startTime: startDate,
+      endTime: endDate
+    }
+
+    try {
+      setIsLoading(true)
+      await apiClient.post('api/reservations', JSON.stringify(reservationData))
+      toast({
+        title: 'Reservation is successfully'
+      })
+      router.push('/reservations')
+    } catch (err) {
+      toast({
+        color: 'red',
+        title: 'Failed to reserve',
+        description: 'Please try again'
+      })
+      console.error(err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    // Calculate duration in hours
+    const durationInHours = Math.ceil((endDate - startDate) / (1000 * 60 * 60))
+    setDuration(durationInHours)
+
+    // Calculate total price
+    const hourlyPrice = checkout?.venue?.price || 0
+    const calculatedTotalPrice = durationInHours * hourlyPrice
+    setTotalPrice(calculatedTotalPrice)
+  }, [startDate, endDate, checkout?.venue?.price])
 
   return (
     <div className='min-h-dvh max-w-7xl mx-auto pt-12 p-4'>
       <div className='flex flex-col md:flex-row gap-8'>
         <div className='border shadow-sm rounded-3xl p-6 w-full md:w-2/3'>
           <h2 className='text-3xl font-bold mb-4'>Checkout</h2>
-          <div className='flex flex-row gap-8 mb-4'>
+          <div className='flex flex-col lg:flex-row gap-8 mb-4'>
             <img
-              alt='Img Title'
-              src='/img/field7.jpg'
-              className='w-full rounded-lg object-cover max-w-[300px] object-center'
+              alt={checkout?.venue?.name}
+              src={checkout?.venue?.image}
+              className='w-full rounded-lg object-cover md:max-w-[300px] object-center'
             />
             <div className='flex flex-col gap-2 my-auto'>
-              <div className='text-xl font-bold'>
-                Lapangan Bola Bandung Hall
-              </div>
+              <div className='text-xl font-bold'>{checkout?.venue?.name}</div>
               <div className='text-md flex gap-2 items-center'>
-                <div>4.7</div>
+                <div>{checkout?.venue?.averageRating}</div>
                 <Star className='w-5 h-5 text-yellow-400 fill-yellow-400' />
                 <div>•</div>
-                <div>Jln. Asia Afrika No. 6, Bandung</div>
+                <div>{checkout?.venue?.location}</div>
               </div>
             </div>
           </div>
@@ -65,7 +106,7 @@ export default function CheckoutForm() {
             <Input
               id='email'
               type='email'
-              value='alvin@courta.com'
+              value={profile?.email}
               className='mt-1'
               disabled
             />
@@ -76,7 +117,19 @@ export default function CheckoutForm() {
               <Input
                 id='firstName'
                 className='mt-1'
-                value='Alvin Indra Pratama'
+                defaultValue={profile?.name}
+              />
+            </div>
+          </div>
+          <div className='grid grid-cols-1 mt-4'>
+            <div>
+              <Label htmlFor='firstName'>Date</Label>
+              <DatePicker
+                className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50'
+                selected={startDate}
+                minDate={new Date()}
+                onChange={date => setDate(date!)}
+                dateFormat='MMMM d, yyyy'
               />
             </div>
           </div>
@@ -86,9 +139,13 @@ export default function CheckoutForm() {
               <div className='w-full flex'>
                 <DatePicker
                   className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50'
-                  selected={new Date()}
-                  onChange={() => {}}
-                  dateFormat='Pp'
+                  selected={startDate}
+                  onChange={date => setStartDate(date!)}
+                  showTimeSelect
+                  showTimeSelectOnly
+                  timeIntervals={60}
+                  timeCaption='Time'
+                  dateFormat='h:mm aa'
                 />
               </div>
             </div>
@@ -97,9 +154,13 @@ export default function CheckoutForm() {
               <div className='w-full flex'>
                 <DatePicker
                   className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50'
-                  selected={new Date()}
-                  onChange={() => {}}
-                  dateFormat='Pp'
+                  selected={endDate}
+                  onChange={date => setEndDate(date!)} // Update end date state
+                  showTimeSelect
+                  showTimeSelectOnly
+                  timeIntervals={60}
+                  timeCaption='Time'
+                  dateFormat='h:mm aa'
                 />
               </div>
             </div>
@@ -111,18 +172,23 @@ export default function CheckoutForm() {
           <div className='mt-4 space-y-2'>
             <div className='flex justify-between'>
               <span>Hourly Rental</span>
-              <span>2 Hours</span>
+              <span>{checkout?.checkout?.timeSlot} Hours</span>
             </div>
             <div className='flex justify-between'>
               <span>Price</span>
-              <span>Rp30.000</span>
+              <span>{formatRupiah(checkout?.venue?.price)}</span>
             </div>
             <div className='flex justify-between font-bold text-lg'>
               <span>Total</span>
-              <span>Rp60.000</span>
+              <span>{formatRupiah(totalPrice)}</span>
             </div>
           </div>
-          <Button className='w-full mt-4' size='lg'>
+          <Button
+            loading={isLoading}
+            className='w-full mt-4'
+            size='lg'
+            onClick={handleReserve}
+          >
             Confirm order
           </Button>
         </div>

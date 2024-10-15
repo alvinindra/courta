@@ -69,6 +69,7 @@
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.15",
     "@types/js-cookie": "^3.0.6",
+    "@types/jsonwebtoken": "^9.0.7",
     "@types/mongodb": "^4.0.7",
     "@types/node": "^22.7.4",
     "@types/react": "^18.3.11",
