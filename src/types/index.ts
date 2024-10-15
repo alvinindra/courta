@@ -60,3 +60,33 @@ export interface MetaReservation {
     updatedAt: string
   }
 }
+
+export interface MetaUser {
+  id: string
+  name: string
+  email: string
+  password: string
+  avatar: string
+  phoneNumber: string
+  role: string
+  description: any
+  createdAt: string
+  updatedAt: string
+}
+
+export interface MetaReview {
+  id: string
+  rating: number
+  comment: string
+  userId: string
+  fieldId: string
+  reservationId: string
+  createdAt: string
+  updatedAt: string
+  user: {
+    id: string
+    name: string
+    email: string
+    avatar: string
+  }
+}

@@ -26,6 +26,7 @@ export default function VenueDetail({ slug }: { slug: string }) {
         const res = await apiClient.get(`/api/fields/${slug}`)
         setVenue(res.data.data)
       } catch (error) {
+        router.push('/404')
         console.error(error)
       } finally {
         setLoading(false)

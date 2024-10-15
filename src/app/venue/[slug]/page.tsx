@@ -9,7 +9,7 @@ export default function VenueDetailPage({
   return (
     <>
       <VenueDetail slug={params.slug} />
-      <VenueReviews />
+      <VenueReviews slug={params.slug} />
     </>
   )
 }
