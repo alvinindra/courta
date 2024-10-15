@@ -1,8 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
-import { ChevronDown, Filter, Grid2X2, Search, X } from 'lucide-react'
+import {
+  ChevronDown,
+  Filter,
+  Grid2X2,
+  MapPin,
+  Search,
+  Star,
+  X
+} from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,10 +19,10 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Card } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Badge } from '@/components/ui/badge'
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -24,14 +32,9 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Input } from '@/components/ui/input'
-
-const subCategories = [
-  { name: 'Totes', href: '#' },
-  { name: 'Backpacks', href: '#' },
-  { name: 'Travel Bags', href: '#' },
-  { name: 'Hip Bags', href: '#' },
-  { name: 'Laptop Sleeves', href: '#' }
-]
+import useSWR from 'swr'
+import { fetcher } from '@/lib/api'
+import { cn, formatRupiah } from '@/lib/utils'
 
 const items = [
   {
@@ -53,6 +56,10 @@ const items = [
   {
     id: 'volleyball',
     label: 'Volleyball'
+  },
+  {
+    id: 'tennis',
+    label: 'Tennis'
   }
 ] as const
 
@@ -63,13 +70,40 @@ const FormSchema = z.object({
 })
 
 export default function VenueList() {
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedSportTypes, setSelectedSportTypes] = useState<string[]>([])
+  const [order, setOrder] = useState('asc')
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       items: ['recents', 'home']
     }
   })
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
+
+  const apiUrl = `/api/fields?sportType=${selectedSportTypes.join(
+    ','
+  )}&search=${searchQuery}&order=${order}`
+
+  const { data: fields, isLoading: loading } = useSWR(apiUrl, fetcher)
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value)
+  }
+
+  // Handle sort order change
+  const handleSortChange = (sortOrder: string) => {
+    setOrder(sortOrder)
+  }
+
+  // Handle sport type filter change
+  const handleSportTypeChange = (selectedItems: string[]) => {
+    setSelectedSportTypes(selectedItems)
+  }
+
+  useEffect(() => {
+    form.setValue('items', selectedSportTypes)
+  }, [selectedSportTypes, form])
 
   return (
     <section className='min-h-dvh'>
@@ -94,12 +128,39 @@ export default function VenueList() {
               <form className='mt-4 border-t border-gray-200'>
                 <h3 className='sr-only'>Filter</h3>
                 <ul role='list' className='px-2 py-3 font-medium text-gray-900'>
-                  {subCategories.map(category => (
-                    <li key={category.name}>
-                      <a href={category.href} className='block px-2 py-3'>
-                        {category.name}
-                      </a>
-                    </li>
+                  {/* Sport Categories */}
+                  {items.map(item => (
+                    <FormField
+                      key={item.id}
+                      control={form.control}
+                      name='items'
+                      render={({ field }) => {
+                        return (
+                          <FormItem
+                            key={item.id}
+                            className='flex flex-row items-center space-x-3 space-y-0'
+                          >
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value?.includes(item.id)}
+                                onCheckedChange={checked => {
+                                  const newSelectedItems = checked
+                                    ? [...field.value, item.id]
+                                    : field.value?.filter(
+                                        value => value !== item.id
+                                      )
+                                  field.onChange(newSelectedItems)
+                                  handleSportTypeChange(newSelectedItems)
+                                }}
+                              />
+                            </FormControl>
+                            <FormLabel className='cursor-pointer font-normal text-md'>
+                              {item.label}
+                            </FormLabel>
+                          </FormItem>
+                        )
+                      }}
+                    />
                   ))}
                 </ul>
               </form>
@@ -120,20 +181,15 @@ export default function VenueList() {
                     </div>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align='end'>
-                    <DropdownMenuItem>Ascending</DropdownMenuItem>
-                    <DropdownMenuItem>Descanding</DropdownMenuItem>
-                    <DropdownMenuItem>Price: Low to High</DropdownMenuItem>
-                    <DropdownMenuItem>Price: High to Low</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleSortChange('asc')}>
+                      Ascending
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleSortChange('desc')}>
+                      Descending
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
-              <button
-                type='button'
-                className='-m-2 ml-5 p-2 my-auto text-gray-400 hover:text-gray-500'
-              >
-                <span className='sr-only'>View grid</span>
-                <Grid2X2 aria-hidden='true' className='h-5 w-5' />
-              </button>
               <button
                 type='button'
                 onClick={() => setMobileFiltersOpen(true)}
@@ -159,6 +215,8 @@ export default function VenueList() {
                     <Input
                       type='search'
                       placeholder='Search...'
+                      value={searchQuery}
+                      onChange={handleSearchChange}
                       className='w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]'
                     />
                   </div>
@@ -185,20 +243,17 @@ export default function VenueList() {
                                     <Checkbox
                                       checked={field.value?.includes(item.id)}
                                       onCheckedChange={checked => {
-                                        return checked
-                                          ? field.onChange([
-                                              ...field.value,
-                                              item.id
-                                            ])
-                                          : field.onChange(
-                                              field.value?.filter(
-                                                value => value !== item.id
-                                              )
+                                        const newSelectedItems = checked
+                                          ? [...field.value, item.id]
+                                          : field.value?.filter(
+                                              value => value !== item.id
                                             )
+                                        field.onChange(newSelectedItems)
+                                        handleSportTypeChange(newSelectedItems)
                                       }}
                                     />
                                   </FormControl>
-                                  <FormLabel className='font-normal text-md'>
+                                  <FormLabel className='cursor-pointer font-normal text-md'>
                                     {item.label}
                                   </FormLabel>
                                 </FormItem>
@@ -215,87 +270,69 @@ export default function VenueList() {
 
               {/* Product grid */}
               <div className='grid gap-4 lg:gap-6 grid-cols-2 lg:grid-cols-3 lg:col-span-3'>
-                <Card className='p-5'>
-                  <a
-                    href='/venue/2'
-                    className='group flex flex-col justify-between'
-                  >
-                    <div>
-                      <div className='flex aspect-[3/2] text-clip rounded-xl'>
-                        <div className='flex-1'>
-                          <div className='relative size-full origin-bottom transition duration-300 group-hover:scale-105'>
-                            <img
-                              src='/img/field1.jpg'
-                              alt='test'
-                              className='size-full object-cover object-center'
-                            />
+                {loading ? (
+                  <div>Loading fields...</div>
+                ) : fields?.data?.length > 0 ? (
+                  fields?.data?.map(field => (
+                    <Card key={field.id} className='p-5'>
+                      <a
+                        href={`/venue/${field.id}`}
+                        className='group flex flex-col justify-between'
+                      >
+                        <div>
+                          <div className='flex aspect-[3/2] text-clip rounded-xl'>
+                            <div className='flex-1'>
+                              <div className='relative size-full origin-bottom transition duration-300 group-hover:scale-105'>
+                                <img
+                                  src={field.image}
+                                  alt={field.name}
+                                  className='size-full object-cover object-center'
+                                />
+                              </div>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                    <div className='mb-2 line-clamp-3 break-words pt-4 text-lg font-medium md:mb-3 md:pt-4 md:text-xl lg:pt-4 lg:text-2xl'>
-                      Lapang Badminton
-                    </div>
-                    <div className='mb-8 line-clamp-2 text-sm text-muted-foreground md:mb-12 md:text-base lg:mb-9'>
-                      Test
-                    </div>
-                    <div className='flex items-center text-sm'>Read more </div>
-                  </a>
-                </Card>
-                <Card className='p-5'>
-                  <a
-                    href='/venue/2'
-                    className='group flex flex-col justify-between'
-                  >
-                    <div>
-                      <div className='flex aspect-[3/2] text-clip rounded-xl'>
-                        <div className='flex-1'>
-                          <div className='relative size-full origin-bottom transition duration-300 group-hover:scale-105'>
-                            <img
-                              src='/img/field2.jpg'
-                              alt='test'
-                              className='size-full object-cover object-center'
-                            />
+                        <div className='mb-2 line-clamp-3 break-words pt-4 text-lg font-medium md:mb-3 md:pt-4 md:text-xl lg:pt-4 lg:text-2xl'>
+                          {field.name}
+                        </div>
+                        <div className='flex flex-row mb-4 items-center gap-2'>
+                          <MapPin className='min-w-fit' size={16} />
+                          <div className='text-sm line-clamp-1 text-slate-500'>
+                            {field.location}
                           </div>
                         </div>
-                      </div>
-                    </div>
-                    <div className='mb-2 line-clamp-3 break-words pt-4 text-lg font-medium md:mb-3 md:pt-4 md:text-xl lg:pt-4 lg:text-2xl'>
-                      Lapang Voli
-                    </div>
-                    <div className='mb-8 line-clamp-2 text-sm text-muted-foreground md:mb-12 md:text-base lg:mb-9'>
-                      Test
-                    </div>
-                    <div className='flex items-center text-sm'>Read more </div>
-                  </a>
-                </Card>
-                <Card className='p-5'>
-                  <a
-                    href='/venue/2'
-                    className='group flex flex-col justify-between'
-                  >
-                    <div>
-                      <div className='flex aspect-[3/2] text-clip rounded-xl'>
-                        <div className='flex-1'>
-                          <div className='relative size-full origin-bottom transition duration-300 group-hover:scale-105'>
-                            <img
-                              src='/img/field3.jpg'
-                              alt='test'
-                              className='size-full object-cover object-center'
-                            />
+                        <div
+                          className='mb-4 line-clamp-2 text-sm text-muted-foreground'
+                          dangerouslySetInnerHTML={{
+                            __html: field.description
+                          }}
+                        />
+                        <Badge className='max-w-fit mb-2 bg-slate-700 capitalize'>
+                          {field.sportType}
+                        </Badge>
+                        <div className='flex items-center'>
+                          <div className='text-lg font-bold mr-auto'>
+                            {formatRupiah(field.price)}{' '}
+                            <span className='text-sm font-normal'>/ Hours</span>
+                          </div>
+                          <Star
+                            className={cn(
+                              'w-5 h-5',
+                              field.averageRating > 0
+                                ? 'text-yellow-400 fill-yellow-400'
+                                : 'text-gray-400 fill-white'
+                            )}
+                          />
+                          <div className='flex ml-2 items-center font-medium'>
+                            ({field.averageRating || 0})
                           </div>
                         </div>
-                      </div>
-                    </div>
-                    <div className='mb-2 line-clamp-3 break-words pt-4 text-lg font-medium md:mb-3 md:pt-4 md:text-xl lg:pt-4 lg:text-2xl'>
-                      Lapang Voli
-                    </div>
-                    <div className='mb-8 line-clamp-2 text-sm text-muted-foreground md:mb-12 md:text-base lg:mb-9'>
-                      Test
-                    </div>
-                    <div className='flex items-center text-sm'>Read more </div>
-                  </a>
-                </Card>
+                      </a>
+                    </Card>
+                  ))
+                ) : (
+                  <div>No fields available</div>
+                )}
               </div>
             </div>
           </section>

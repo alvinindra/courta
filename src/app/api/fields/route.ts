@@ -7,19 +7,21 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url)
     const page = parseInt(searchParams.get('page') || '1') // Default page 1
     const limit = parseInt(searchParams.get('limit') || '8') // Default limit 8
-    const sportType = searchParams.get('sportType') // Filter by sport type (optional)
+    const sportTypeParam = searchParams.get('sportType') // Filter by sport type (optional)
     const order =
       searchParams.get('order')?.toLowerCase() === 'desc' ? 'desc' : 'asc' // Default order by 'asc'
     const searchQuery = searchParams.get('search') // Search query (optional)
+    const sortField = searchParams.get('sortField') || 'createdAt'
 
     // Calculate the number of records to skip based on the page and limit
     const skip = (page - 1) * limit
 
     // Build the where clause for filtering by sport type and searching
     let whereClause: any = {}
+    const sportType = sportTypeParam ? sportTypeParam.split(',') : undefined
 
     if (sportType) {
-      whereClause.sportType = sportType
+      whereClause.sportType = { in: sportType }
     }
 
     if (searchQuery) {
@@ -34,8 +36,39 @@ export async function GET(req: Request) {
       skip,
       take: limit,
       where: whereClause,
+      select: {
+        id: true,
+        name: true,
+        createdAt: true,
+        updatedAt: true,
+        description: true,
+        image: true,
+        location: true,
+        price: true,
+        sportType: true,
+        Review: {
+          select: {
+            rating: true
+          }
+        }
+      },
       orderBy: {
-        createdAt: order
+        [sortField]: order // Sort by the selected field (price, sportType, createdAt)
+      }
+    })
+
+    // Count the total number of fields (for calculating total pages)
+    const fieldsWithRatings = fields.map(field => {
+      const totalRatings = field.Review.reduce(
+        (sum, review) => sum + review.rating,
+        0
+      )
+      const averageRating = field.Review.length
+        ? totalRatings / field.Review.length
+        : null
+      return {
+        ...field,
+        averageRating
       }
     })
 
@@ -43,6 +76,19 @@ export async function GET(req: Request) {
     const totalFields = await prisma.field.count({
       where: whereClause // Use the same filtering for counting total records
     })
+
+    return NextResponse.json(
+      {
+        data: fieldsWithRatings,
+        meta: {
+          page,
+          limit,
+          totalPages: Math.ceil(totalFields / limit),
+          totalFields
+        }
+      },
+      { status: 200 }
+    )
 
     return NextResponse.json(
       {
@@ -67,9 +113,10 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const { name, location, sportType, price, description } = await req.json()
+    const { name, location, sportType, price, image, description } =
+      await req.json()
 
-    if (!name || !location || !sportType || !price) {
+    if (!name || !location || !sportType || !price || !image) {
       return NextResponse.json(
         { error: 'Name, location, sportType, and price are required' },
         { status: 400 }
@@ -82,6 +129,7 @@ export async function POST(req: Request) {
         location,
         sportType,
         price,
+        image,
         description
       }
     })

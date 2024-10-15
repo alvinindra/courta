@@ -9,24 +9,23 @@ import {
 const HomeFaq = () => {
   const faqs = [
     {
-      question: 'What is a FAQ?',
+      question: 'How do I make a field reservation through the Courta app?',
       answer:
-        'A FAQ is a list of frequently asked questions and answers on a particular topic.'
+        'To make a reservation, you first need to create an account or log in to your existing account. Once logged in, you can search for fields based on location and sport type. After selecting a field and an available time slot, you can proceed with payment via bank transfer. Don’t forget to upload the payment proof to confirm your reservation. You will receive a confirmation email once the reservation is successful.'
     },
     {
-      question: 'What is the purpose of a FAQ?',
+      question: 'How can I cancel or modify my reservation?',
       answer:
-        'The purpose of a FAQ is to provide answers to common questions and help users find the information they need quickly and easily.'
+        'You can cancel or modify your reservation through the "My Reservations" page within the app. Find the reservation you wish to cancel or change, and follow the provided instructions. Please note that cancellations or modifications must comply with the cancellation policy, and there may be cancellation fees depending on the terms set by the field provider.'
     },
     {
-      question: 'How do I create a FAQ?',
-      answer:
-        'To create a FAQ, you need to compile a list of common questions and answers on a particular topic and organize them in a clear and easy-to-navigate format.'
+      question: 'Can I leave a review or rating after using the field?',
+      answer: `Yes, after you have finished using the field, you can leave a review and rating. This can be done through the "My Reservations" page, where you can rate the field's facilities and provide feedback for other users. Your review helps others choose the right field for their needs.`
     },
     {
-      question: 'What are the benefits of a FAQ?',
+      question: 'How do I make payments in the Courta app?',
       answer:
-        'The benefits of a FAQ include providing quick and easy access to information, reducing the number of support requests, and improving the overall user experience.'
+        'Currently, payments in the Courta app are made via bank transfer. After selecting a field and a time slot, you will be given instructions to make a transfer to the registered bank account. Once the transfer is completed, you need to upload the payment proof in the app to validate your reservation. You will receive a confirmation notification via email once validation is complete.'
     }
   ]
 

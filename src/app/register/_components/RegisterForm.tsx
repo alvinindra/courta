@@ -52,8 +52,8 @@ export function SignUpForm() {
     } catch (error: any) {
       toast({
         color: 'red',
-        title: 'Gagal melakukan login',
-        description: 'Silakan coba lagi'
+        title: 'Failed to register',
+        description: 'Please try again'
       })
       console.error(error)
     } finally {

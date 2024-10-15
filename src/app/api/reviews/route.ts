@@ -2,6 +2,56 @@ import { prisma } from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyToken } from '@/lib/auth'
 
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url)
+  const isTestimonials = searchParams.get('testimonials') === 'true'
+
+  try {
+    // Fetch testimonials if the parameter is true
+    if (isTestimonials) {
+      const testimonials = await prisma.review.findMany({
+        select: {
+          comment: true,
+          rating: true,
+          user: {
+            select: {
+              avatar: true,
+              name: true
+            }
+          },
+          field: {
+            select: {
+              name: true
+            }
+          }
+        },
+        orderBy: {
+          createdAt: 'desc'
+        },
+        take: 10 // Limit the number of testimonials to the latest 10
+      })
+
+      return NextResponse.json({
+        message: 'Testimonials fetched successfully',
+        data: testimonials
+      })
+    }
+
+    return NextResponse.json(
+      {
+        error: 'Testimonials parameter is required to be true'
+      },
+      { status: 400 }
+    )
+  } catch (error) {
+    console.error('Error fetching testimonials:', error)
+    return NextResponse.json(
+      { error: 'Failed to fetch testimonials' },
+      { status: 500 }
+    )
+  }
+}
+
 export async function POST(req: Request) {
   const authHeader = req.headers.get('authorization')
 

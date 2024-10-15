@@ -27,6 +27,7 @@ model Field {
   name         String
   location     String
   sportType    String
+  image        String
   price        Float
   reservations Reservation[]
   Review       Review[]

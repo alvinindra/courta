@@ -42,7 +42,7 @@ export function LoginForm() {
       Cookies.set('token', res.data.token)
       setProfile(res.data.user)
       toast({
-        title: 'Berhasil melakukan login'
+        title: 'Login is successfully'
       })
 
       if (res.data.user.role === 'admin') {
@@ -53,8 +53,8 @@ export function LoginForm() {
     } catch (error: any) {
       toast({
         color: 'red',
-        title: 'Gagal melakukan login',
-        description: 'Silakan coba lagi'
+        title: 'Failed to login',
+        description: 'Please try again'
       })
       console.error(error)
     } finally {

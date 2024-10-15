@@ -1,8 +1,5 @@
 'use client'
 import Link from 'next/link'
-import { BrowserOnly } from 'react-kuh'
-
-import { ThemeToggle } from '@/components/layout'
 import { Button } from '../ui/button'
 import { CircleUser } from 'lucide-react'
 import { usePathname } from 'next/navigation'
@@ -10,7 +7,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
