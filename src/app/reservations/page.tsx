@@ -1,3 +1,4 @@
+'use client'
 import ReservationHistory from './_components/ReservationHistory'
 
 export default function OrderPage() {

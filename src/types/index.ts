@@ -36,4 +36,27 @@ export interface MetaReservation {
   status: string
   createdAt: string
   updatedAt: string
+  user: {
+    id: string
+    name: string
+    email: string
+    password: string
+    avatar: string
+    phoneNumber: string
+    role: string
+    description: any
+    createdAt: string
+    updatedAt: string
+  }
+  field: {
+    id: string
+    name: string
+    location: string
+    sportType: string
+    image: string
+    price: number
+    description: string
+    createdAt: string
+    updatedAt: string
+  }
 }

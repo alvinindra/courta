@@ -1,56 +1,12 @@
-import { Star } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn, formatRupiah } from '@/lib/utils'
-
-type Reservation = {
-  id: string
-  image: string
-  name: string
-  totalPrice: number
-  status: 'pending' | 'confirmed' | 'cancelled'
-  rating?: any
-}
-
-const reservations: Reservation[] = [
-  {
-    id: '6703fa1638d7076f05fea69f',
-    image:
-      'https://g-5rfyqmvqzvq.vusercontent.net/placeholder.svg?height=200&width=200',
-    name: 'Luxury Suite',
-    totalPrice: 60000,
-    status: 'confirmed',
-    rating: 4
-  },
-  {
-    id: '6703fa1638d7076f05fea69f',
-    image:
-      'https://g-5rfyqmvqzvq.vusercontent.net/placeholder.svg?height=200&width=200',
-    name: 'Ocean View Room',
-    totalPrice: 500000,
-    status: 'pending',
-    rating: null
-  },
-  {
-    id: '6703fa1638d7076f05fea69f',
-    image:
-      'https://g-5rfyqmvqzvq.vusercontent.net/placeholder.svg?height=200&width=200',
-    name: 'Mountain Cabin',
-    totalPrice: 1000000,
-    status: 'cancelled',
-    rating: null
-  },
-  {
-    id: '6703fa1638d7076f05fea69f',
-    image:
-      'https://g-5rfyqmvqzvq.vusercontent.net/placeholder.svg?height=200&width=200',
-    name: 'City Apartment',
-    totalPrice: 800000,
-    status: 'confirmed',
-    rating: 5
-  }
-]
+import { useEffect, useState } from 'react'
+import { apiClient } from '@/lib/api'
+import { MetaReservation } from '@/types'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
 
 const statusVariants = {
   pending: 'capitalize bg-yellow-200 text-yellow-800',
@@ -59,17 +15,32 @@ const statusVariants = {
 }
 
 export default function ReservationHistory() {
+  const [data, setData] = useState<MetaReservation[]>([])
+
+  useEffect(() => {
+    const getReservations = async () => {
+      try {
+        const res = await apiClient.get('api/reservations')
+        setData(res.data.data)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    getReservations()
+  })
+
   return (
     <ScrollArea className='w-full whitespace-nowrap rounded-md border'>
       <div className='space-y-4 p-4'>
-        {reservations.map(reservation => (
+        {data.map(reservation => (
           <Card key={reservation.id} className='overflow-hidden'>
             <CardContent className='p-0'>
               <div className='flex flex-col sm:flex-row'>
                 <div className='w-full sm:w-[300px] h-48'>
                   <img
-                    src={reservation.image}
-                    alt={reservation.name}
+                    src={reservation.field.image}
+                    alt={reservation.field.name}
                     className='w-full h-full object-cover'
                   />
                 </div>
@@ -77,7 +48,7 @@ export default function ReservationHistory() {
                   <div>
                     <div className='flex flex-row justify-between'>
                       <h3 className='text-lg font-semibold mb-2'>
-                        {reservation.name}
+                        {reservation.field.name}
                       </h3>
                       <Badge
                         className={cn(
@@ -96,22 +67,13 @@ export default function ReservationHistory() {
                     <p className='font-semibold mb-2 sm:mb-0'>
                       Total: {formatRupiah(reservation.totalPrice)}
                     </p>
-                    {reservation?.status === 'confirmed' &&
-                      reservation?.rating && (
-                        <div className='flex items-center'>
-                          <span className='mr-1'>Rating:</span>
-                          {[...Array(5)].map((_, index) => (
-                            <Star
-                              key={index}
-                              className={`w-4 h-4 ${
-                                index < reservation?.rating
-                                  ? 'text-yellow-400 fill-current'
-                                  : 'text-gray-300'
-                              }`}
-                            />
-                          ))}
-                        </div>
-                      )}
+                    {reservation.status === 'pending' && (
+                      <Button asChild>
+                        <Link href={`/confirmation/${reservation.id}`}>
+                          Confirm Payment
+                        </Link>
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>

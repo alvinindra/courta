@@ -35,6 +35,7 @@ import { Input } from '@/components/ui/input'
 import useSWR from 'swr'
 import { fetcher } from '@/lib/api'
 import { cn, formatRupiah } from '@/lib/utils'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 const items = [
   {
@@ -70,6 +71,9 @@ const FormSchema = z.object({
 })
 
 export default function VenueList() {
+  const searchParams = useSearchParams()
+  const paramsSportType = searchParams.get('sportType')
+
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedSportTypes, setSelectedSportTypes] = useState<string[]>([])
   const [order, setOrder] = useState('asc')
@@ -104,6 +108,11 @@ export default function VenueList() {
   useEffect(() => {
     form.setValue('items', selectedSportTypes)
   }, [selectedSportTypes, form])
+
+  useEffect(() => {
+    setSelectedSportTypes([paramsSportType!])
+    form.setValue('items', [paramsSportType!])
+  }, [paramsSportType])
 
   return (
     <section className='min-h-dvh'>

@@ -82,7 +82,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { status } = await req.json()
+    const { status, paymentProofUrl } = await req.json()
     const allowedStatuses = ['pending', 'confirmed', 'cancelled']
 
     if (!allowedStatuses.includes(status)) {
@@ -98,7 +98,8 @@ export async function PUT(
     const updatedReservation = await prisma.reservation.update({
       where: { id: params.id },
       data: {
-        status: status || undefined
+        status: status || undefined,
+        paymentProofUrl
       },
       include: {
         user: true,

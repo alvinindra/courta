@@ -17,7 +17,10 @@ export default function HomeCategory() {
 
           <ul className='mt-8 grid grid-cols-1 gap-4 lg:grid-cols-3'>
             <li>
-              <a href='#' className='group relative block'>
+              <a
+                href='/venue?sportType=basketball'
+                className='group relative block'
+              >
                 <img
                   src='/img/field5.jpg'
                   alt=''
@@ -35,7 +38,10 @@ export default function HomeCategory() {
             </li>
 
             <li>
-              <a href='#' className='group relative block'>
+              <a
+                href='/venue?sportType=futsal'
+                className='group relative block'
+              >
                 <img
                   src='/img/field6.jpg'
                   alt=''
@@ -53,7 +59,10 @@ export default function HomeCategory() {
             </li>
 
             <li className='lg:col-span-2 lg:col-start-2 lg:row-span-2 lg:row-start-1'>
-              <a href='#' className='group relative block'>
+              <a
+                href='/venue?sportType=football'
+                className='group relative block'
+              >
                 <img
                   src='/img/field7.jpg'
                   alt=''
