@@ -99,13 +99,13 @@ export async function POST(req: Request) {
            <li>Date: ${date}</li>
            <li>Price: ${formatRupiah(field.price)}</li>
            <li>Time Slot: ${timeSlot}</li>
-           <li>Total Price: Rp${formatRupiah(totalPrice)}</li>
+           <li>Total Price: ${formatRupiah(totalPrice)}</li>
          </ul>
          <p>Please upload your payment proof to confirm the reservation.</p>
          <div>Go to your confirmation page: <a href="${
            process.env.SITE_URL
          }/confirmation/${
-          field.id
+          reservation.id
         }" target="_blank">Confirm Your Payment</a></div>
          <p>Thank you!</p>`
       })
@@ -149,8 +149,14 @@ export async function GET(req: Request) {
 
     const skip = (page - 1) * limit
 
-    const whereClause: any = { userId: verifiedUser.userId }
-    if (status) whereClause.status = status
+    let whereClause: any
+    if (verifiedUser.role === 'admin') {
+      whereClause = {} // Admin can see all reservations
+      if (status) whereClause.status = status // Optional status filter for admin
+    } else {
+      whereClause = { userId: verifiedUser.userId } // Regular user sees their own reservations
+      if (status) whereClause.status = status // Optional status filter for user
+    }
 
     const reservations = await prisma.reservation.findMany({
       skip,

@@ -45,7 +45,7 @@ model Reservation {
   totalPrice      Float
   paymentProofUrl String? // Optional proof of transfer URL
   payment         Payment?
-  status          String   @default("pending") // pending, confirmed, cancelled
+  status          String   @default("pending") // pending, confirmed, finished, cancelled
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 

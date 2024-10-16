@@ -126,7 +126,7 @@ export default function CheckoutForm() {
               <Label htmlFor='firstName'>Date</Label>
               <DatePicker
                 className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50'
-                selected={startDate}
+                selected={date}
                 minDate={new Date()}
                 onChange={date => setDate(date!)}
                 dateFormat='MMMM d, yyyy'
@@ -172,7 +172,7 @@ export default function CheckoutForm() {
           <div className='mt-4 space-y-2'>
             <div className='flex justify-between'>
               <span>Hourly Rental</span>
-              <span>{checkout?.checkout?.timeSlot} Hours</span>
+              <span>{duration} Hours</span>
             </div>
             <div className='flex justify-between'>
               <span>Price</span>
